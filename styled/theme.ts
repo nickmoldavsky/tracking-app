@@ -21,6 +21,6 @@ export const AppTheme = {
     subtitle: "#000",
     text: "#324b50",
     button: "#2196F3", //#2C6BED
-    itemSeparator: "#ccc"
+    itemSeparator: "#CCC"
   },
 };
