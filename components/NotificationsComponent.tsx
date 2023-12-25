@@ -177,7 +177,7 @@ StyleSheet.create({
   },
   paragraph: {},
   row: {
-    width: "65%",
+    width: "95%",
     flexDirection: "row",
     margin: 10,
     alignItems: "center",

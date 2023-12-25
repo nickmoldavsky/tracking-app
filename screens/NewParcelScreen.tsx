@@ -43,7 +43,7 @@ const NewParcelScreen = ({ navigation, route }) => {
   );
   const trackingId = route.params?.id;
   const uid = Math.floor(Math.random() * 10000) + 1;
-  const actionTitle = route.params?.action === "add" ? "Add" : "Edit";
+  const actionTitle = route.params?.action;
   const input = useRef<HTMLInputElement>();  //TODO check correct type
   const pageTitle = i18n.t("ADD_NEW_PARCEL_TITLE");
 
@@ -137,7 +137,7 @@ const NewParcelScreen = ({ navigation, route }) => {
                 backgroundColor: AppTheme[theme].button,
                 borderRadius: 3,
               }}
-              title={actionTitle + " shipment"}
+              title={i18n.t(actionTitle)}
               onPress={() => addNewParcel(actionTitle)}
             />
           </View>

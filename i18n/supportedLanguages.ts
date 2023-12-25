@@ -27,6 +27,8 @@ const en = {
   arrived: "Arrived",
   archive: "Archive",
   pickup: "Arrived at pick-up point",
+  add: "Add",
+  edit: "Edit",
 };
 
 const ru = {
@@ -57,7 +59,9 @@ const ru = {
   transit: "В пути",
   arrived: "прибыл",
   archive: "Архив",
-  pickup: "ожидает получения"
+  pickup: "ожидает получения",
+  add: "Добавить",
+  edit: "Обновить",
 };
 
 const he = {

@@ -8,7 +8,7 @@ export const AppTheme = {
     title: "#FFF",
     subtitle: "#FFF",
     text: "#FFF",
-    button: "#00C5A2", 
+    button: "#00C5A2",
     itemSeparator: "#000",
   },
 
@@ -20,6 +20,6 @@ export const AppTheme = {
     subtitle: "#000",
     text: "#324b50",
     button: "#2196F3", //#2C6BED
-    itemSeparator: "#CCC"
+    itemSeparator: "#CCC",
   },
 };
