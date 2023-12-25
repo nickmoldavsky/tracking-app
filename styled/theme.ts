@@ -10,7 +10,6 @@ export const AppTheme = {
     text: "#FFF",
     button: "#00C5A2", 
     itemSeparator: "#000",
-    
   },
 
   light: {
