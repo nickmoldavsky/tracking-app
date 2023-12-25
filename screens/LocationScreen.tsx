@@ -1,0 +1,140 @@
+import React, { useEffect, useState, useMemo, useLayoutEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  FlatList,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
+import { useSelector, useDispatch } from "react-redux";
+import { setLanguage, setLocation } from "../store/settingsSlice";
+import { AppTheme } from "../styled/theme";
+import { ISettingsState } from "../interfaces/state";
+import { MaterialCommunityIcons } from "@expo/vector-icons/";
+import i18n from "../i18n/i18n";
+
+export default function LocationScreen({ navigation, route }) {
+  type Item = {
+    id: number;
+    title: string;
+    value: string;
+  };
+  const ACTION = route.params.action;
+  const dispatch = useDispatch();
+  const { theme, darkmode, language, location } = useSelector(
+    (state: ISettingsState) => state.settings
+  );
+  const [selectedItem, setSelectedItem] = useState(
+    ACTION !== "SET_LOCATION" ? language : location
+  );
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
+  const LANGUAGE_DATA = [
+    { id: 1, title: "English", value: "en" },
+    { id: 2, title: "Russian", value: "ru" },
+    { id: 3, title: "Hebrew", value: "he" },
+  ];
+
+  const LOCATION_DATA = [
+    { id: 1, title: "Israel", value: "israel" },
+    { id: 2, title: "Russia", value: "russia" },
+    { id: 3, title: "USA", value: "usa" },
+  ];
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: i18n.t(ACTION),
+      headerBackTitleVisible: false,
+      headerStyle: {
+        backgroundColor: AppTheme[theme].header,
+      },
+    });
+  }, [theme, language]);
+
+  const Item = ({ item, onPress, backgroundColor, textColor }) => (
+    <TouchableOpacity
+      onPress={onPress}
+      style={[styles.item, backgroundColor]}
+      disabled={item.value === selectedItem}
+    >
+      <Text style={[styles.title, textColor]}>{item.title}</Text>
+      {item.value === selectedItem && (
+        <MaterialCommunityIcons
+          name="check-circle"
+          size={20}
+          color="#FFF"
+          style={styles.icon}
+        />
+      )}
+    </TouchableOpacity>
+  );
+
+  const setItem = (item: Item) => {
+    setSelectedItem(item.value);
+    if (ACTION !== "SET_LOCATION") {
+      dispatch(setLanguage(item.value));
+    } else {
+      dispatch(setLocation(item.value));
+    }
+  };
+
+  const renderItem = ({ item }) => {
+    const backgroundColor =
+      item.value === selectedItem
+        ? AppTheme[theme].button
+        : AppTheme[theme].container;
+    const color = AppTheme[theme].text;
+    return (
+      <Item
+        item={item}
+        onPress={() => {
+          setItem(item);
+        }}
+        backgroundColor={{ backgroundColor }}
+        textColor={{ color }}
+      />
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <FlatList
+        data={ACTION !== "SET_LANGUAGE" ? LOCATION_DATA : LANGUAGE_DATA}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        //extraData={selectedId}
+      />
+    </SafeAreaView>
+  );
+}
+
+const createStyles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      marginTop: 0,
+      backgroundColor: AppTheme[theme].container,
+    },
+    item: {
+      margin: 10,
+      padding: 10,
+      backgroundColor: AppTheme[theme].container,
+      width: "95%",
+      flex: 1,
+      alignSelf: "center",
+      flexDirection: "row",
+      borderRadius: 5,
+      justifyContent: "space-between",
+    },
+    icon: {},
+    title: {
+      fontSize: 18,
+    },
+    row: {
+      flexDirection: "row",
+      margin: 10,
+      alignItems: "center",
+    },
+  });

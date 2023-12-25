@@ -1,0 +1,67 @@
+const en = {
+  welcome: "Welcome",
+  signoutBtn: "Sign out",
+  signOutAlertTitle: "Cancel",
+  signOutAlertMess: "Are you sure you want to remove",
+  confirm: "Okay",
+  resetBtn: "Reset password",
+  shipping: "Shipping",
+  delivered: "Delivered",
+  all: "All",
+  search: "Search",
+  formTitle: "Title (Optional)",
+  formTrackingNumber: "Tracking Number",
+  ADD: "Add",
+  UPDATE: "Update",
+  DELETE: "Delete",
+  EDIT: "Edit",
+  ARCHIVE: "Archive",
+  ADD_NEW_PARCEL_TITLE: "Add New Parcel",
+  SETTINGS: "Settings",
+  APP_LANGUAGE: "App language",
+  DESTINATION_COUNTRY: "Destination Country",
+  SET_LOCATION: "Location Settings",
+  SET_LANGUAGE: "Language Settings",
+  DARK_THEME: "Dark Theme",
+  transit: "Transit",
+  arrived: "Arrived",
+  archive: "Archive",
+  pickup: "Arrived at pick-up point",
+};
+
+const ru = {
+  welcome: "добро пожаловать",
+  signoutBtn: "выход",
+  signOutAlertTitle: "Отмена",
+  signOutAlertMess: "Вы уверены, что хотите удалить",
+  confirm: "подтверждать",
+  resetBtn: "Сброс пароля",
+  shipping: "В пути",
+  delivered: "Доставлено",
+  all: "Все",
+  search: "Поиск",
+  formTitle: "Название посылки (опция)",
+  formTrackingNumber: "Номер отслеживания",
+  ADD: "Добавить",
+  UPDATE: "Обновить",
+  DELETE: "Удалить",
+  EDIT: "Редактировать",
+  ARCHIVE: "Доставлено",
+  ADD_NEW_PARCEL_TITLE: "добавить новую посылку",
+  SETTINGS: "Настройки",
+  APP_LANGUAGE: "Язык приложения",
+  DESTINATION_COUNTRY: "Страна назначения",
+  SET_LOCATION: "Настройки местоположения",
+  SET_LANGUAGE: "Настройки языка",
+  DARK_THEME: "Темная тема",
+  transit: "В пути",
+  arrived: "прибыл",
+  archive: "Архив",
+  pickup: "ожидает получения"
+};
+
+const he = {
+
+}
+
+export { en, ru };
