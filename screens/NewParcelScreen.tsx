@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from "react";
 import {
   View,
   Text,
@@ -18,23 +24,25 @@ import { StackActions } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import { addParcel, editParcel } from "../store/parcelSlice";
 //interface
-import { IParcelState, ISettingsState, IUserState } from "../interfaces/state";
+import { IParcelState, ISettingsState } from "../interfaces/state";
 import { IParcel } from "../interfaces/parcel";
 //style
 import { AppTheme } from "../styled/theme";
 import i18n from "../i18n/i18n";
+import { RootState } from "../store/store";
 
 const NewParcelScreen = ({ navigation, route }) => {
+  //
   //store
   const dispatch = useDispatch();
-  const parcels = useSelector((state: IParcelState) => state.parcel.items);
-  console.log("newParcelScreen useSelector state.parcel:", parcels);
-  const {theme, language} = useSelector((state: ISettingsState) => state.settings);
+  const parcels = useSelector((state: RootState) => state.parcel.items);
+  //console.log("newParcelScreen useSelector state.parcel:", parcels);
+  const { theme, language } = useSelector(
+    (state: RootState) => state.settings
+  );
   i18n.locale = language;
-
   // Constructing styles for current theme
-  const styles: any = useMemo(() => createStyles(theme), [theme]);
-
+  const styles: any = useMemo(() => createStyles(theme), [theme]); //TODO: change any type
   const [inputTrackNumber, setInputTrackNumber] = useState(
     route.params?.action === "add" ? "" : route.params?.trackingNumber
   );
@@ -44,7 +52,7 @@ const NewParcelScreen = ({ navigation, route }) => {
   const trackingId = route.params?.id;
   const uid = Math.floor(Math.random() * 10000) + 1;
   const actionTitle = route.params?.action;
-  const input = useRef<HTMLInputElement>();  //TODO check correct type
+  const input = useRef<HTMLInputElement | null>(null); //TODO check correct type
   const pageTitle = i18n.t("ADD_NEW_PARCEL_TITLE");
 
   useLayoutEffect(() => {
@@ -58,36 +66,36 @@ const NewParcelScreen = ({ navigation, route }) => {
     input.current.focus();
   }, []);
 
-  const addNewParcel = (action = "Add") => {
-    if(!inputTrackNumber) {
-      input.current?.shake();
+  const addNewParcel = (action = "add") => {
+    //alert('action' + action); return;
+    if (!inputTrackNumber) {
+      input.current.shake();
       return;
     }
-    
-    if (action !== "Add") {
-      const payload: IParcel = {
+    //update parcel
+    if (action !== "add") {
+      const parcel: IParcel = {
         id: trackingId,
         trackingNumber: inputTrackNumber,
         title: inputTrackTitle,
       };
-      console.log("edit payload: ", payload);
-      dispatch(editParcel(payload));
+      console.log("edit payload: ", parcel);
+      dispatch(editParcel(parcel));
       navigation.navigate("Home");
       return;
     }
-
-    const newParcel: IParcel = {
+    //add parcel
+    const payload: IParcel = {
       id: uid,
       title: inputTrackTitle,
       trackingNumber: inputTrackNumber,
     };
-
-    dispatch(addParcel(newParcel));
+    dispatch(addParcel(payload));
     //navigate to the main screen
     navigation.dispatch(StackActions.popToTop());
     navigation.navigate("Details", {
       trackingNumber: inputTrackNumber,
-      id: newParcel.id,
+      id: payload.id,
       trackingTitle: inputTrackTitle,
     });
   };
@@ -148,18 +156,18 @@ const NewParcelScreen = ({ navigation, route }) => {
 };
 
 type Style = {
-  container;
-  formView;
-  formInput;
-  buttonsWrapper;
-  button;
+  container: ViewStyle;
+  formView: ViewStyle;
+  formInput: ViewStyle;
+  buttonsWrapper: ViewStyle;
+  button: ViewStyle;
   inner: ViewStyle;
   formTitle: TextStyle;
-  imageWrapper;
+  imageWrapper: ViewStyle;
   image: ImageStyle;
 };
 
-const createStyles = (theme) =>
+const createStyles = (theme: string) =>
   StyleSheet.create<Style>({
     container: {
       flex: 1,

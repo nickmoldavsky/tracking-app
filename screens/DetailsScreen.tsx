@@ -16,6 +16,7 @@ import {
   Animated,
   ActivityIndicator,
   RefreshControl,
+  AppState,
 } from "react-native";
 import { ListItem } from "react-native-elements";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons/";
@@ -34,11 +35,13 @@ import { IParcelState, ISettingsState } from "../interfaces/state";
 //styled
 import { AppTheme } from "../styled/theme";
 import i18n from "../i18n/i18n";
+import { RootState } from "../store/store";
 
 const DetailsScreen = ({ route, navigation }) => {
   const trackingId = route.params?.trackingNumber;
+  //alert('page opened !!!' + trackingId);
   const parcelId = route.params?.id;
-  const parcelIndex = route.params?.index;
+  //const parcelIndex = route.params?.index;
   const [parcelInfo, setParcelInfo] = useState<IParcel>();
   const [elementVisible, setElementVisible] = useState<boolean>(false);
   const [responseError, setResponseError] = useState<boolean>(false);
@@ -48,16 +51,19 @@ const DetailsScreen = ({ route, navigation }) => {
   const dispatch = useDispatch<any>();
   //const dispatch = useAppDispatch();
   const { items, isLoading, error } = useSelector(
-    (state: IParcelState) => state.parcel
+    (state: RootState) => state.parcel
   );
   const { theme, language, location } = useSelector(
-    (state: ISettingsState) => state.settings
+    (state: RootState) => state.settings
   );
   // Constructing styles for current theme
   const styles: any = useMemo(() => createStyles(theme), [theme]); //TODO change <any> type
   const loadingIndicator: boolean = isLoading;
   const firstUpdate: MutableRefObject<boolean> = useRef(true);
   const fetchData: MutableRefObject<boolean> = useRef(false);
+  //app state
+  const appState = useRef(AppState.currentState);
+  const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -78,7 +84,9 @@ const DetailsScreen = ({ route, navigation }) => {
   useEffect(() => {
     if (firstUpdate.current) {
       firstUpdate.current = false;
+      //alert("if firstUpdate.current" + firstUpdate.current);
     } else {
+      //alert("else fetchData.current" + fetchData.current);
       if (
         (!parcelInfo?.status || parcelInfo?.status !== "delivered") &&
         !fetchData.current
@@ -91,7 +99,29 @@ const DetailsScreen = ({ route, navigation }) => {
       //TODO: abort request when living page
       //promise.abort();
     };
-  }, [parcelInfo]);
+  }, [parcelInfo]); //TODO check if
+
+  useEffect(() => {
+    AppState.addEventListener("change", _handleAppStateChange);
+
+    return () => {
+      //AppState.removeEventListener("change", _handleAppStateChange);
+    };
+  }, []);
+
+  const _handleAppStateChange = (nextAppState) => {
+    if (
+      appState.current.match(/inactive|background/) &&
+      nextAppState === "active"
+    ) {
+      console.log("App has come to the foreground!");
+      //alert('App has come to the foreground!');
+    }
+
+    appState.current = nextAppState;
+    setAppStateVisible(appState.current);
+    console.log("AppState", appState.current);
+  };
 
   const fetchParcelData = async () => {
     const requestParams: IRequestParams = {
@@ -109,7 +139,7 @@ const DetailsScreen = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    updateParcelInfo(parcelId);
+    updateParcelInfo(trackingId);
   }, [items]);
 
   const delay = async (ms: number) => new Promise((res) => setTimeout(res, ms));
@@ -129,10 +159,10 @@ const DetailsScreen = ({ route, navigation }) => {
     }
   };
 
-  const updateParcelInfo = (id: number) => {
+  const updateParcelInfo = (id: string) => {
     items.find((item) => {
-      if (item.id === id) {
-        console.log("item by id:", item);
+      if (item.trackingNumber === id) {
+        console.log("item by trackingId:", item);
         setParcelInfo((prevParcelInfo) => {
           return (prevParcelInfo = item);
         });
@@ -186,10 +216,7 @@ const DetailsScreen = ({ route, navigation }) => {
                 style={[
                   StyleSheet.absoluteFill,
                   {
-                    backgroundColor:
-                      parcelInfo?.status !== "delivered"
-                        ? AppTheme[theme].button
-                        : "green",
+                    backgroundColor: AppTheme[theme].button,
                     width:
                       parcelInfo?.status !== "delivered"
                         ? parcelInfo?.status !== "arrived"
@@ -236,11 +263,7 @@ const DetailsScreen = ({ route, navigation }) => {
                     <MaterialCommunityIcons
                       name="circle-double"
                       size={10}
-                      color={
-                        parcelInfo?.status !== "delivered"
-                          ? AppTheme[theme].button
-                          : "green"
-                      }
+                      color={AppTheme[theme].button}
                     />
                     <ListItem.Content>
                       <ListItem.Title
@@ -338,6 +361,7 @@ const createStyles = (theme: string) =>
     },
     scrollView: {
       //backgroundColor: AppTheme[theme].container,
+      minHeight: 100,
     },
   });
 

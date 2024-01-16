@@ -21,11 +21,13 @@ import styled from "styled-components/native";
 import { AppTheme } from "../styled/theme";
 import { ISettingsState } from "../interfaces/state";
 import FooterComponent from "../components/FooterComponent";
+import { RootState } from "../store/store";
 
+//TODO: add React.FC
 const SettingsScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const { theme, colors, darkmode, language, location } = useSelector(
-    (state: ISettingsState) => state.settings
+    (state: RootState) => state.settings
   );
   const Container = styled.View`
     background-color: ${darkmode ? "#000" : "#fff"};

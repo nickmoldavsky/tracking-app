@@ -1,6 +1,7 @@
-import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import React, { useEffect, useRef } from "react";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import * as Notifications from "expo-notifications";
 
 import HomeScreen from "./screens/HomeScreen";
 import NewParcelScreen from "./screens/NewParcelScreen";
@@ -21,10 +22,34 @@ export default function App() {
     headerTintColor: "white",
   };
 
+  //notification
+  const navigationContainerRef = useRef();
+  const lastNotificationResponse = Notifications.useLastNotificationResponse();
+  //const navigation = useNavigation();
+
+  useEffect(() => {
+    //notification clicked
+    if (lastNotificationResponse) {
+      console.log("notification response:", lastNotificationResponse.notification.request.content);
+      if (navigationContainerRef.current) {
+        navigationContainerRef.current.navigate("Details", {
+          trackingNumber:
+            lastNotificationResponse.notification.request.content.data
+              .trackingNumber,
+          trackingTitle:
+            lastNotificationResponse.notification.request.content.data.title,
+          id: lastNotificationResponse.notification.request.content.data.id,
+        });
+      }
+      
+    }
+    //
+  }, [lastNotificationResponse]);
+
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <NavigationContainer>
+        <NavigationContainer ref={navigationContainerRef}>
           <Stack.Navigator screenOptions={globalScreenOptions}>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="NewParcel" component={NewParcelScreen} options={{animation: "none"}} />

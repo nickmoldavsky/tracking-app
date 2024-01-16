@@ -27,8 +27,10 @@ const en = {
   arrived: "Arrived",
   archive: "Archive",
   pickup: "Arrived at pick-up point",
-  add: "Add",
+  add: "ADD",
   edit: "Edit",
+  NOTIFICATION_TITLE: "Your parcel has an update!",
+  NOTIFICATION_STATUS: " has an update from",
 };
 
 const ru = {
@@ -62,6 +64,8 @@ const ru = {
   pickup: "ожидает получения",
   add: "Добавить",
   edit: "Обновить",
+  NOTIFICATION_TITLE: "Your parcel has an update!",
+  NOTIFICATION_STATUS: " has an update from",
 };
 
 const he = {

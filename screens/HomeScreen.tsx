@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useLayoutEffect,
   ReactPropTypes,
+  useRef,
 } from "react";
 import {
   SafeAreaView,
@@ -16,6 +17,7 @@ import {
   TouchableOpacity,
   Modal,
   Alert,
+  RefreshControl,
 } from "react-native";
 import { SearchBar, Avatar } from "react-native-elements";
 import {
@@ -25,15 +27,12 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons/";
 
-import {
-  useIsFocused,
-  RouteProp,
-  NavigationProp,
-} from "@react-navigation/native";
+import { useIsFocused } from "@react-navigation/native";
 
 //store
 import { useSelector, useDispatch } from "react-redux";
 import {
+  deleteDeliveredParcels,
   deleteParcel,
   setUpdateStateFlag,
   setErrorStateFlag,
@@ -44,21 +43,35 @@ import { DateTime } from "i18n-js";
 //#store
 
 //interfaces
-import { IParcel } from "../interfaces/parcel";
+import { INavigationParams, IParcel } from "../interfaces/parcel";
 import { IParcelState, ISettingsState } from "../interfaces/state";
 //styled
 import { AppTheme } from "../styled/theme";
 import i18n from "../i18n/i18n";
+import { RootState } from "../store/store";
+import { NativeStackScreenProps } from "@react-navigation/native-stack/lib/typescript/src/types";
 
-//const ICON_TYPE = "string";
+//TODO: move to types
+type RootStackParamList = {
+  Home: undefined;
+  Details: {
+    trackingNumber: string;
+    trackingTitle: string;
+    id?: number;
+    index?: number;
+  };
+  NewParcel: {
+    action: string;
+    id?: number;
+    title?: string;
+    trackingNumber?: string;
+  };
+  Settings: {};
+};
 
-interface Props {
-  navigation: NavigationProp<{}>;
-  route: RouteProp<{}>;
-  //route: RouteProp<{ params: { trackingNumber: ICON_TYPE } }, 'params'>
-}
+type ProfileProps = NativeStackScreenProps<RootStackParamList, "Home">;
 
-const HomeScreen: React.FC = ({ navigation, route }: Props) => {
+const HomeScreen: React.FC = ({ navigation, route }: ProfileProps) => {
   const [search, setSearch] = useState<string>("");
   const [filteredDataSource, setFilteredDataSource] = useState<IParcel[]>([]);
   const [masterDataSource, setMasterDataSource] = useState<IParcel[]>([]);
@@ -68,14 +81,13 @@ const HomeScreen: React.FC = ({ navigation, route }: Props) => {
   const [activeTab, setActiveTab] = useState<string>("");
   //TODO delete it
   const [modal, setModal] = useState({ action: "", value: "", visible: false });
-
   //store
   const dispatch = useDispatch();
   const { items, updateStateFlag } = useSelector(
-    (state: IParcelState) => state.parcel
+    (state: RootState) => state.parcel
   );
   const { theme, darkmode, language, location } = useSelector(
-    (state: ISettingsState) => state.settings
+    (state: RootState) => state.settings
   );
   i18n.locale = language;
   // Constructing styles for current theme
@@ -121,7 +133,6 @@ const HomeScreen: React.FC = ({ navigation, route }: Props) => {
   }, [masterDataSource]);
 
   useEffect(() => {
-    console.log("home page route params:", route.params);
     if (isFocused) {
       dispatch(setErrorStateFlag(false));
       if (updateStateFlag) {
@@ -152,11 +163,6 @@ const HomeScreen: React.FC = ({ navigation, route }: Props) => {
 
   const clearParams = () => {
     dispatch(setUpdateStateFlag(false));
-    navigation.setParams({
-      trackingNumber: null,
-      trackingTitle: null,
-      updateState: false,
-    });
   };
 
   //TODO: change it
@@ -211,12 +217,12 @@ const HomeScreen: React.FC = ({ navigation, route }: Props) => {
   };
 
   const getItemDetails = (item: IParcel, index: string) => {
-    console.log("getItemDetails item:", item);
+    //console.log("getItemDetails item:", item);
     navigation.navigate("Details", {
       trackingNumber: item.trackingNumber,
       trackingTitle: item.title,
-      id: item.id,
-      index: index,
+      //id: item.id,
+      //index: index,
     });
   };
 
@@ -312,22 +318,40 @@ const HomeScreen: React.FC = ({ navigation, route }: Props) => {
     }
   };
 
-  const showConfirmDialog = () => {
-    return Alert.alert(
-      "Delete parcel?",
-      "Are you sure you want to remove " + itemData.title + "?",
-      [
-        {
-          text: "Cancel",
-        },
-        {
-          text: "Delete",
-          onPress: () => {
-            deleteItem();
+  const showConfirmDialog = (action: string) => {
+    if (action === "DELETE_ALL") {
+      return Alert.alert(
+        "Delete all delivered parcels?",
+        "Are you sure you want to remove all delivered items?",
+        [
+          {
+            text: "Cancel",
           },
-        },
-      ]
-    );
+          {
+            text: "Delete",
+            onPress: () => {
+              deleteDeliveredParcels();
+            },
+          },
+        ]
+      );
+    } else {
+      return Alert.alert(
+        "Delete parcel?",
+        "Are you sure you want to remove " + itemData.title + "?",
+        [
+          {
+            text: "Cancel",
+          },
+          {
+            text: "Delete",
+            onPress: () => {
+              deleteItem();
+            },
+          },
+        ]
+      );
+    }
   };
 
   const updateParcel = (status: string) => {
@@ -355,7 +379,10 @@ const HomeScreen: React.FC = ({ navigation, route }: Props) => {
   //   }
   // };
 
-  //const onPress = () => {};
+  const deleteDeliveredItems = () => {
+    return;
+    dispatch(deleteDeliveredParcels());
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -442,16 +469,35 @@ const HomeScreen: React.FC = ({ navigation, route }: Props) => {
           </Pressable>
         </View>
 
+        {activeTab === "delivered" && (
+          <View style={styles.row}>
+            <Pressable
+              style={[styles.deleteButton, styles.row]}
+              onPress={() => showConfirmDialog("DELETE_ALL")}
+            >
+              <MaterialCommunityIcons
+              style={styles.modalIcon}
+              name="delete-outline"
+              size={24}
+              color="black"
+            />
+              <Text style={styles.text}>Delete all delivered items</Text>
+            </Pressable>
+          </View>
+        )}
+
         <FlatList
-          data={filteredDataSource}
+          data={[...filteredDataSource].sort((a, b) => {
+            return a.title.localeCompare(b.status);
+          })}
           keyExtractor={(item, index) => index.toString()}
           ItemSeparatorComponent={itemSeparatorView}
           renderItem={itemView}
         />
 
-        <View style={styles.circleButtonContainer}>
+        <View style={styles.addButtonContainer}>
           <Pressable
-            style={styles.circleButton}
+            style={styles.addButton}
             onPress={() => navigation.navigate("NewParcel", { action: "add" })}
             //onPress={() => navigation.navigate("Notifications", { action: "add" })}
           >
@@ -510,10 +556,13 @@ const HomeScreen: React.FC = ({ navigation, route }: Props) => {
             />
             <Text style={styles.text}>{i18n.t("EDIT")}</Text>
           </Pressable>
-          <Pressable style={styles.row} onPress={showConfirmDialog}>
-            <AntDesign
+          <Pressable
+            style={styles.row}
+            onPress={() => showConfirmDialog("DELETE")}
+          >
+            <MaterialCommunityIcons
               style={styles.modalIcon}
-              name="delete"
+              name="delete-outline"
               size={24}
               color="black"
             />
@@ -531,6 +580,7 @@ const createStyles = (theme: string) =>
       backgroundColor: AppTheme[theme].container,
       flex: 1,
     },
+    headerRight: {},
     tabView: {
       justifyContent: "space-between",
       //alignItems: 'center',
@@ -539,6 +589,7 @@ const createStyles = (theme: string) =>
       borderBottomColor: "transparent",
       borderTopColor: "transparent",
     },
+    searchBar: {},
     button: {
       flex: 1,
       justifyContent: "center",
@@ -562,12 +613,13 @@ const createStyles = (theme: string) =>
     text: {
       color: AppTheme[theme].text,
     },
-    circleButtonContainer: {
+    addButtonContainer: {
       alignSelf: "flex-end",
       position: "absolute",
       bottom: 25,
       right: 25,
     },
+    addButton: {},
     row: {
       flexDirection: "row",
       margin: 10,
@@ -606,6 +658,13 @@ const createStyles = (theme: string) =>
       height: "25%",
       justifyContent: "center",
       alignItems: "flex-start",
+    },
+    deleteDeliveredButton: {},
+    deleteButton: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      margin: 1,
     },
   });
 

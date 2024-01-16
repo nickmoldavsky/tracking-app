@@ -1,13 +1,26 @@
-import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createAsyncThunk,
+  current,
+  PayloadAction,
+} from "@reduxjs/toolkit";
 import axios from "axios";
 //notification
-import { setNotification } from "../components/NotificationsComponent";
+import { setNotification } from "../helpers/NotificationsHelper";
 //interfaces
 import { IParcel, IRequestParams } from "../interfaces/parcel";
 import { IParcelState } from "../interfaces/state";
 
-const initialState = {
-  items: <IParcel[]>[],
+type Notification = {
+  id: number;
+  parcelTitle: string;
+  trackingNumber: string;
+  title: string;
+  status: string;
+};
+
+const initialState: IParcelState = {
+  items: [],
   isLoading: false,
   error: false,
   updateStateFlag: false,
@@ -20,8 +33,9 @@ const randomRgb = () => {
   return `rgb(${red}, ${green}, ${blue})`;
 };
 
-const API_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIzMjUwMDk3MC1mZDNhLTExZWQtYjViZC03MTg2YTk3NzRiOTEiLCJzdWJJZCI6IjY0NzMxZjBmNzNkMGJiNTE5NzllNmJmYiIsImlhdCI6MTY4NTI2NjE5MX0.w4gvxSgOOWM1gsUoKcqR-pTJAWPqjSFPmv7TV_-urCs";
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+const API_KEY = process.env.EXPO_PUBLIC_API_KEY;
+
 //let timeOutId: number | null = null;
 let timeOutId: ReturnType<typeof setTimeout>;
 
@@ -29,34 +43,42 @@ export const checkTrackingStatus = createAsyncThunk<IParcel[], string>(
   "parcel/checkTrackingStatus",
   async (uuid, { dispatch, getState }) => {
     const res = await axios.get(
-      "https://parcelsapp.com/api/v3/shipments/tracking?uuid=" +
-        uuid +
-        "&apiKey=" +
-        API_KEY
+      API_URL + "?uuid=" + uuid + "&apiKey=" + API_KEY
     );
     const data = await res.data;
-    console.log("checkTrackingStatus response:", data);
+    console.log("parcelSlice/checkTrackingStatus response:", data);
     //
     if (data.done) {
       if (data.shipments[0].error) {
         console.error("checkTrackingStatus error:", data.shipments[0].error);
-        if (timeOutId) clearTimeout(timeOutId);
+        if (timeOutId) {
+          clearTimeout(timeOutId);
+        }
         //TODO: show error message to the user
         //state.error = true;
         return data;
       } else {
         dispatch(updateParcel(data));
         console.log("Tracking complete");
-        if (timeOutId) clearTimeout(timeOutId);
+        if (timeOutId) {
+          clearTimeout(timeOutId);
+        }
         return data;
       }
     } else {
       console.log("Tracking in progress...");
-      timeOutId = setTimeout(() => {
-        dispatch(checkTrackingStatus(uuid));
-        // polling in 1 sec cycles
-      }, 1000);
-      console.log("setTimeout timeOutId:", timeOutId);
+      //  timeOutId = setTimeout(() => {
+      //    dispatch(checkTrackingStatus(uuid));
+      //    // polling in 1 sec cycles
+      //  }, 1000);
+      //
+      //    return new Promise((resolve) => setTimeout(function () {
+      //     console.log('promise...');
+      //     dispatch(checkTrackingStatus(uuid));
+      //     //resolve();
+      // }, 3000))
+      //
+      //console.log("setTimeout timeOutId:", timeOutId);
       return data;
     }
   }
@@ -65,20 +87,17 @@ export const checkTrackingStatus = createAsyncThunk<IParcel[], string>(
 export const getPackageInfo = createAsyncThunk<IParcel[], IRequestParams>(
   "parcel/getPackageInfo",
   async (requestParams, { dispatch }) => {
-    const res = await axios.post(
-      "https://parcelsapp.com/api/v3/shipments/tracking",
-      {
-        shipments: [
-          {
-            trackingId: requestParams.trackingId,
-            destinationCountry: requestParams.location,
-          },
-        ],
-        language: requestParams.language,
-        apiKey: API_KEY,
-      }
-    );
-    const data = await res.data;
+    const res = await axios.post(API_URL, {
+      shipments: [
+        {
+          trackingId: requestParams.trackingId,
+          destinationCountry: requestParams.location,
+        },
+      ],
+      language: requestParams.language,
+      apiKey: API_KEY,
+    });
+    const data = await res.data; //TODO check if need it
     console.log("parcelslice/getPackageInfo response data:", data);
 
     if (!data.error) {
@@ -88,7 +107,7 @@ export const getPackageInfo = createAsyncThunk<IParcel[], IRequestParams>(
       } else {
         if (data.uuid) {
           console.log("calling checkTrackingStatus function...");
-          dispatch(checkTrackingStatus(data.uuid));
+          //dispatch(checkTrackingStatus(data.uuid));
           return data;
         }
       }
@@ -98,45 +117,45 @@ export const getPackageInfo = createAsyncThunk<IParcel[], IRequestParams>(
   }
 );
 
-export const createNotifications = createAsyncThunk(
-  "parcel/createNotifications",
-  async (time, { dispatch, getState }) => {
-    const items: IParcel[] = getState().parcel.items;
-    let counter = 0;
-    const data = <IParcel>{}; //TODO: check correct type?
-    //TODO: change it: get data from user slice
-    const requestParams: IRequestParams = {
-      location: "USA",
-      language: "EN",
-      trackingId: ''
-    };
-    items.map((item: IParcel) => {
-      counter++;
-      if (!item.status || (item.status && item.status !== "delivered")) {
-        //if (item.status !== "delivered") {
-        data.title =
-          "New update for parcel " + item.title + " " + item.trackingNumber;
-        data.status = item.status;
-        requestParams.trackingId = item.trackingNumber;
-        const response = dispatch(getPackageInfo(requestParams));
-        response.then(() => {
-          console.log("createNotifications response:", response);
-        })
-        
-        //setNotification(data, 1);
-        // }
-      }
-    });
-  }
-);
+// export const createNotifications = createAsyncThunk(
+//   "parcel/createNotifications",
+//   async (time, { dispatch, getState }) => {
+//     const items: IParcel[] = getState().parcel.items;
+//     let counter = 0;
+//     const data = <IParcel>{}; //TODO: check correct type?
+//     //TODO: change it: get data from user slice
+//     const requestParams: IRequestParams = {
+//       location: "USA",
+//       language: "EN",
+//       trackingId: "",
+//     };
+//     items.map((item: IParcel) => {
+//       counter++;
+//       if (!item.status || (item.status && item.status !== "delivered")) {
+//         //if (item.status !== "delivered") {
+//         data.title =
+//           "New update for parcel " + item.title + " " + item.trackingNumber;
+//         data.status = item.status;
+//         requestParams.trackingId = item.trackingNumber;
+//         const promise = dispatch(getPackageInfo(requestParams));
+//         promise.then((response) => {
+//           console.log("createNotifications response:", response.payload);
+//         });
+
+//         //setNotification(data, 1);
+//         // }
+//       }
+//     });
+//   }
+// );
 
 export const parcelSlice = createSlice({
   name: "parcel",
   initialState,
   reducers: {
-    setStateColor: (state) => {
-      state.items = [...state.items, randomRgb()];
-    },
+    // setStateColor: (state) => {
+    //   state.items = [...state.items, randomRgb()];
+    // },
 
     setUpdateStateFlag: (state, action) => {
       state.updateStateFlag = action.payload;
@@ -146,6 +165,14 @@ export const parcelSlice = createSlice({
       state.error = action.payload;
     },
 
+    deleteDeliveredParcels: (state) => {
+      const filteredData = state.items.filter(function (item) {
+        return item.status !== 'delevered';
+      });
+      state.items = filteredData;
+      state.updateStateFlag = true;
+    },
+      
     deleteParcel: (state, action) => {
       //console.log("delete parcel", action.payload);
       const filteredData = state.items.filter(function (item) {
@@ -170,10 +197,13 @@ export const parcelSlice = createSlice({
         return;
       }
 
+      //TODO: first check if parcel has updates
+      let statesCounter = 0;
+
       //TODO: change it
       const parcel: IParcel = {
         id: null,
-        title: '',
+        title: "",
         trackingNumber: action.payload.shipments[0].trackingId,
         status: action.payload.shipments[0].status,
         states: action.payload.shipments[0].states,
@@ -183,8 +213,6 @@ export const parcelSlice = createSlice({
         lastState: action.payload.shipments[0].lastState,
       };
 
-      let statesCounter = 0;
-
       if (parcel.states) {
         console.log("parcelSlice/updateParcel/states:", parcel.states);
         statesCounter = parcel.states.length ? parcel.states.length : 0;
@@ -193,7 +221,7 @@ export const parcelSlice = createSlice({
 
       state.items.find((item) => {
         if (item.trackingNumber === parcel.trackingNumber) {
-          console.log("LOOP item", current(item));
+          console.log("parcelSlice/updateParcel/find item", current(item));
           let currentStatesCounter = 0;
 
           if (item.states) {
@@ -213,11 +241,19 @@ export const parcelSlice = createSlice({
             item.lastState = parcel?.lastState;
             //TODO: send notification here...
             //test notification
-            const data = {
-              title: 'Your parcel has an update!',
-              status: item.title + ' has an update from ' + item.carriers[item.lastState?.carrier] + ': new status is ' + item.status,
+            const notificationData: Notification = {
+              id: item.id,
+              parcelTitle: item.title,
+              trackingNumber: parcel.trackingNumber,
+              title: "Your parcel has an update!",
+              status:
+                item.title +
+                " has an update from " +
+                item.carriers[item.lastState?.carrier] +
+                ": " +
+                item.lastState?.status,
             };
-            setNotification(data, 5);
+            setNotification(notificationData, 5);
             //#test notification
           }
         }
@@ -228,7 +264,7 @@ export const parcelSlice = createSlice({
       console.log("editParcel action.payload:", action.payload);
       state.items.find((item) => {
         if (item.id === action.payload.id) {
-          if(action.payload.action !== "UPDATE_STATUS") {
+          if (action.payload.action !== "UPDATE_STATUS") {
             item.trackingNumber = action.payload.trackingNumber;
             item.title = action.payload.title;
           } else {
@@ -245,14 +281,17 @@ export const parcelSlice = createSlice({
     builder.addCase(getPackageInfo.pending, (state) => {
       state.isLoading = true;
     });
-    builder.addCase(getPackageInfo.fulfilled, (state, action) => {
-      if (!action.payload?.uuid) {
-        state.isLoading = false;
+    builder.addCase(
+      getPackageInfo.fulfilled,
+      (state, action: PayloadAction<IParcel[]>) => {
+        if (!action.payload['uuid']) {
+          state.isLoading = false;
+        }
       }
-    });
+    );
     builder.addCase(getPackageInfo.rejected, (state, action) => {
       state.isLoading = false;
-      state.error = action.error.message; 
+      state.error = action.error.message;
     });
 
     //checkTrackingStatus
@@ -260,7 +299,7 @@ export const parcelSlice = createSlice({
       state.isLoading = true;
     });
     builder.addCase(checkTrackingStatus.fulfilled, (state, action) => {
-      if (action.payload.done) {
+      if (action.payload['done']) {
         state.isLoading = false;
         //TODO: remove the code below, slice made for state changes only, do not call dispatch!!!
         //parcelSlice.caseReducers.updateParcel(state, action);
@@ -279,6 +318,7 @@ export const {
   setUpdateStateFlag,
   setErrorStateFlag,
   addParcel,
+  deleteDeliveredParcels,
   deleteParcel,
   updateParcel,
   editParcel,

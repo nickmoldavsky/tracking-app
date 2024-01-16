@@ -1,23 +1,23 @@
 import { IParcel } from "./parcel";
 
 export interface IParcelState {
-  parcel: {
+  // parcel: {
     items: IParcel[];
     isLoading: boolean;
-    error: boolean;
+    error: boolean | string;
     updateStateFlag: boolean;
-  };
+  // };
 }
 
 export interface IUserState {
-  user: {
+  //user: {
     language: string;
     location: string;
   };
-}
+//}
 
 export interface ISettingsState {
-  settings: {
+  //settings: {
     darkmode: boolean;
     colors?: {
       header: string;
@@ -30,4 +30,4 @@ export interface ISettingsState {
     language: string;
     location: string;
   };
-}
+//}

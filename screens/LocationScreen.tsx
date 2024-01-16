@@ -21,6 +21,7 @@ export default function LocationScreen({ navigation, route }) {
     title: string;
     value: string;
   };
+
   const ACTION = route.params.action;
   const dispatch = useDispatch();
   const { theme, darkmode, language, location } = useSelector(
@@ -30,13 +31,11 @@ export default function LocationScreen({ navigation, route }) {
     ACTION !== "SET_LOCATION" ? language : location
   );
   const styles = useMemo(() => createStyles(theme), [theme]);
-
   const LANGUAGE_DATA = [
     { id: 1, title: "English", value: "en" },
     { id: 2, title: "Russian", value: "ru" },
     { id: 3, title: "Hebrew", value: "he" },
   ];
-
   const LOCATION_DATA = [
     { id: 1, title: "Israel", value: "israel" },
     { id: 2, title: "Russia", value: "russia" },
