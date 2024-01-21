@@ -15,6 +15,7 @@ export interface IParcel {
   origin?: string;
   destination?: string;
   carriers?: string;
+  action?: string; //TODO: remove it
   lastState?: States;
   states?: {
     date: string;

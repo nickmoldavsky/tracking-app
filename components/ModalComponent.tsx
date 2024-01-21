@@ -77,6 +77,7 @@ const ModalComponent = (props) => {
 };
 
 const styles = StyleSheet.create({
+  container: {},
   row: {
     flexDirection: "row",
     margin: 10,

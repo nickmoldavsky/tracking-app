@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationAction, NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as Notifications from "expo-notifications";
 
@@ -23,7 +23,7 @@ export default function App() {
   };
 
   //notification
-  const navigationContainerRef = useRef();
+  const navigationContainerRef = useRef<NavigationAction>();
   const lastNotificationResponse = Notifications.useLastNotificationResponse();
   //const navigation = useNavigation();
 
@@ -32,7 +32,7 @@ export default function App() {
     if (lastNotificationResponse) {
       console.log("notification response:", lastNotificationResponse.notification.request.content);
       if (navigationContainerRef.current) {
-        navigationContainerRef.current.navigate("Details", {
+        navigationContainerRef.current?.navigate("Details", {
           trackingNumber:
             lastNotificationResponse.notification.request.content.data
               .trackingNumber,

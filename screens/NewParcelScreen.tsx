@@ -30,10 +30,9 @@ import { IParcel } from "../interfaces/parcel";
 import { AppTheme } from "../styled/theme";
 import i18n from "../i18n/i18n";
 import { RootState } from "../store/store";
+import { NewParcelScreenProps } from "../types/types";
 
-const NewParcelScreen = ({ navigation, route }) => {
-  //
-  //store
+const NewParcelScreen: React.FC = ({ navigation, route }: NewParcelScreenProps) => {
   const dispatch = useDispatch();
   const parcels = useSelector((state: RootState) => state.parcel.items);
   //console.log("newParcelScreen useSelector state.parcel:", parcels);
@@ -69,7 +68,7 @@ const NewParcelScreen = ({ navigation, route }) => {
   const addNewParcel = (action = "add") => {
     //alert('action' + action); return;
     if (!inputTrackNumber) {
-      input.current.shake();
+      input.current?.shake();
       return;
     }
     //update parcel

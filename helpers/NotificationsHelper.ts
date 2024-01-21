@@ -1,4 +1,5 @@
 import * as Notifications from "expo-notifications";
+import i18n from "../i18n/i18n";
 
 //TODO: add data type
 export function setNotification(data, seconds: number) {

@@ -39,39 +39,18 @@ import {
   editParcel,
   updateParcel,
 } from "../store/parcelSlice";
-import { DateTime } from "i18n-js";
-//#store
-
 //interfaces
 import { INavigationParams, IParcel } from "../interfaces/parcel";
-import { IParcelState, ISettingsState } from "../interfaces/state";
 //styled
 import { AppTheme } from "../styled/theme";
 import i18n from "../i18n/i18n";
 import { RootState } from "../store/store";
 import { NativeStackScreenProps } from "@react-navigation/native-stack/lib/typescript/src/types";
+import { RootStackParamList, UpdateParcelParams } from "../types/types";
 
-//TODO: move to types
-type RootStackParamList = {
-  Home: undefined;
-  Details: {
-    trackingNumber: string;
-    trackingTitle: string;
-    id?: number;
-    index?: number;
-  };
-  NewParcel: {
-    action: string;
-    id?: number;
-    title?: string;
-    trackingNumber?: string;
-  };
-  Settings: {};
-};
+type HomeProps = NativeStackScreenProps<RootStackParamList, "Home">;
 
-type ProfileProps = NativeStackScreenProps<RootStackParamList, "Home">;
-
-const HomeScreen: React.FC = ({ navigation, route }: ProfileProps) => {
+const HomeScreen: React.FC = ({ navigation, route }: HomeProps) => {
   const [search, setSearch] = useState<string>("");
   const [filteredDataSource, setFilteredDataSource] = useState<IParcel[]>([]);
   const [masterDataSource, setMasterDataSource] = useState<IParcel[]>([]);
@@ -355,12 +334,12 @@ const HomeScreen: React.FC = ({ navigation, route }: ProfileProps) => {
   };
 
   const updateParcel = (status: string) => {
-    const payload = {
+    const params: UpdateParcelParams = {
       id: itemData.id,
       action: "UPDATE_STATUS",
       status,
     };
-    dispatch(editParcel(payload));
+    dispatch(editParcel(params));
     closeEditModal();
   };
 
@@ -393,7 +372,7 @@ const HomeScreen: React.FC = ({ navigation, route }: ProfileProps) => {
             onChangeText={(value) => searchFilterFunction(value)}
             value={search}
             lightTheme={!darkmode}
-            round="true"
+            round={true}
             containerStyle={styles.searchBarContainer}
           />
         </View>

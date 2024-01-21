@@ -17,6 +17,7 @@ import i18n from "../i18n/i18n";
 import { IParcel, IRequestParams } from "../interfaces/parcel";
 import { getPackageInfo, checkTrackingStatus } from "../store/parcelSlice";
 import { RootState } from "../store/store";
+import { useAppDispatch } from "../hooks/redux";
 
 const BACKGROUND_FETCH_TASK = "background-fetch";
 let itemsCounter: number = 0;
@@ -60,7 +61,8 @@ const askNotification = async () => {
 };
 
 const NotificationsComponent: React.FC = () => {
-  const dispatch = useDispatch();
+  //const dispatch:  = useDispatch();
+  const dispatch = useAppDispatch();
   const items = useSelector((state: RootState) => state.parcel.items);
   const { theme, language, location } = useSelector(
     (state: RootState) => state.settings
@@ -136,14 +138,6 @@ const NotificationsComponent: React.FC = () => {
   };
 
   createNotifications = async () => {
-    //test
-    // const data = {
-    //   title: 'TaskManager run in create notification func!',
-    //   status: 'Got background fetch call at date',
-    // }
-    // setNotification(data, 3);
-    //test
-    //  create a loop function
     console.log(
       "*****createNotifications items counter****** i:",
       itemsCounter

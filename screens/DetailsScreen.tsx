@@ -36,8 +36,9 @@ import { IParcelState, ISettingsState } from "../interfaces/state";
 import { AppTheme } from "../styled/theme";
 import i18n from "../i18n/i18n";
 import { RootState } from "../store/store";
+import { DetailsScreenProps } from "../types/types";
 
-const DetailsScreen = ({ route, navigation }) => {
+const DetailsScreen: React.FC = ({ route, navigation }: DetailsScreenProps) => {
   const trackingId = route.params?.trackingNumber;
   //alert('page opened !!!' + trackingId);
   const parcelId = route.params?.id;

@@ -22,9 +22,9 @@ import { AppTheme } from "../styled/theme";
 import { ISettingsState } from "../interfaces/state";
 import FooterComponent from "../components/FooterComponent";
 import { RootState } from "../store/store";
+import { SettingsScreenProps } from "../types/types";
 
-//TODO: add React.FC
-const SettingsScreen = ({ navigation }) => {
+const SettingsScreen: React.FC = ({ navigation }: SettingsScreenProps) => {
   const dispatch = useDispatch();
   const { theme, colors, darkmode, language, location } = useSelector(
     (state: RootState) => state.settings

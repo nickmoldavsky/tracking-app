@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { ISettingsState } from "../interfaces/state";
 
-const initialState = {
+const initialState: ISettingsState = {
   darkmode: false,
   colors: {
     header: "#ebfbff",

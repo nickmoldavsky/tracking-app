@@ -14,18 +14,14 @@ import { AppTheme } from "../styled/theme";
 import { ISettingsState } from "../interfaces/state";
 import { MaterialCommunityIcons } from "@expo/vector-icons/";
 import i18n from "../i18n/i18n";
+import { RootState } from "../store/store";
+import { Item, LocationScreenProps } from "../types/types";
 
-export default function LocationScreen({ navigation, route }) {
-  type Item = {
-    id: number;
-    title: string;
-    value: string;
-  };
-
+const LocationScreen: React.FC = ({ navigation, route }: LocationScreenProps) => {
   const ACTION = route.params.action;
   const dispatch = useDispatch();
   const { theme, darkmode, language, location } = useSelector(
-    (state: ISettingsState) => state.settings
+    (state: RootState) => state.settings
   );
   const [selectedItem, setSelectedItem] = useState(
     ACTION !== "SET_LOCATION" ? language : location
@@ -137,3 +133,5 @@ const createStyles = (theme: any) =>
       alignItems: "center",
     },
   });
+
+  export default LocationScreen;

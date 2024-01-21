@@ -64,8 +64,8 @@ const ru = {
   pickup: "ожидает получения",
   add: "Добавить",
   edit: "Обновить",
-  NOTIFICATION_TITLE: "Your parcel has an update!",
-  NOTIFICATION_STATUS: " has an update from",
+  NOTIFICATION_TITLE: "У вашей посылки обновление!",
+  NOTIFICATION_STATUS: " есть обновление от",
 };
 
 const he = {

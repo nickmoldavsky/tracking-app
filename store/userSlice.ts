@@ -11,7 +11,6 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     setLocation: (state, action) => {
-      //state.location = [...state.location, action.payload];
       state.location = action.payload;
     },
     setLanguage: (state, action) => {

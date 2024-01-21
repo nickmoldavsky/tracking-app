@@ -10,14 +10,7 @@ import { setNotification } from "../helpers/NotificationsHelper";
 //interfaces
 import { IParcel, IRequestParams } from "../interfaces/parcel";
 import { IParcelState } from "../interfaces/state";
-
-type Notification = {
-  id: number;
-  parcelTitle: string;
-  trackingNumber: string;
-  title: string;
-  status: string;
-};
+import { UpdateParcelParams, Notification } from "../types/types";
 
 const initialState: IParcelState = {
   items: [],
@@ -42,10 +35,10 @@ let timeOutId: ReturnType<typeof setTimeout>;
 export const checkTrackingStatus = createAsyncThunk<IParcel[], string>(
   "parcel/checkTrackingStatus",
   async (uuid, { dispatch, getState }) => {
-    const res = await axios.get(
+    const res = await axios.get( //<IParcel[]>
       API_URL + "?uuid=" + uuid + "&apiKey=" + API_KEY
     );
-    const data = await res.data;
+    const data = res.data;
     console.log("parcelSlice/checkTrackingStatus response:", data);
     //
     if (data.done) {
@@ -157,23 +150,23 @@ export const parcelSlice = createSlice({
     //   state.items = [...state.items, randomRgb()];
     // },
 
-    setUpdateStateFlag: (state, action) => {
+    setUpdateStateFlag: (state, action: PayloadAction<boolean>) => {
       state.updateStateFlag = action.payload;
     },
 
-    setErrorStateFlag: (state, action) => {
+    setErrorStateFlag: (state, action: PayloadAction<boolean>) => {
       state.error = action.payload;
     },
 
     deleteDeliveredParcels: (state) => {
       const filteredData = state.items.filter(function (item) {
-        return item.status !== 'delevered';
+        return item.status !== "delevered";
       });
       state.items = filteredData;
       state.updateStateFlag = true;
     },
-      
-    deleteParcel: (state, action) => {
+
+    deleteParcel: (state, action: PayloadAction<number>) => {
       //console.log("delete parcel", action.payload);
       const filteredData = state.items.filter(function (item) {
         return item.id !== action.payload;
@@ -182,7 +175,7 @@ export const parcelSlice = createSlice({
       state.updateStateFlag = true;
     },
 
-    addParcel: (state, action) => {
+    addParcel: (state, action: PayloadAction<IParcel>) => {
       console.log("addParcel reducer action:", action.payload);
       state.items = [...state.items, action.payload];
       state.updateStateFlag = true;
@@ -260,7 +253,7 @@ export const parcelSlice = createSlice({
       });
     },
 
-    editParcel: (state, action) => {
+    editParcel: (state, action: PayloadAction<UpdateParcelParams>) => {
       console.log("editParcel action.payload:", action.payload);
       state.items.find((item) => {
         if (item.id === action.payload.id) {
@@ -284,7 +277,7 @@ export const parcelSlice = createSlice({
     builder.addCase(
       getPackageInfo.fulfilled,
       (state, action: PayloadAction<IParcel[]>) => {
-        if (!action.payload['uuid']) {
+        if (!action.payload["uuid"]) {
           state.isLoading = false;
         }
       }
@@ -299,7 +292,7 @@ export const parcelSlice = createSlice({
       state.isLoading = true;
     });
     builder.addCase(checkTrackingStatus.fulfilled, (state, action) => {
-      if (action.payload['done']) {
+      if (action.payload["done"]) {
         state.isLoading = false;
         //TODO: remove the code below, slice made for state changes only, do not call dispatch!!!
         //parcelSlice.caseReducers.updateParcel(state, action);
