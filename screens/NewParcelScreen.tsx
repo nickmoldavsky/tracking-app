@@ -17,6 +17,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Image,
+  TextInput,
 } from "react-native";
 import { Input, Button } from "react-native-elements";
 import { StackActions } from "@react-navigation/native";
@@ -30,7 +31,7 @@ import { IParcel } from "../interfaces/parcel";
 import { AppTheme } from "../styled/theme";
 import i18n from "../i18n/i18n";
 import { RootState } from "../store/store";
-import { NewParcelScreenProps } from "../types/types";
+import { EditParcelParams, NewParcelScreenProps, UpdateParcelParams } from "../types/types";
 
 const NewParcelScreen: React.FC = ({ navigation, route }: NewParcelScreenProps) => {
   const dispatch = useDispatch();
@@ -51,7 +52,7 @@ const NewParcelScreen: React.FC = ({ navigation, route }: NewParcelScreenProps) 
   const trackingId = route.params?.id;
   const uid = Math.floor(Math.random() * 10000) + 1;
   const actionTitle = route.params?.action;
-  const input = useRef<HTMLInputElement | null>(null); //TODO check correct type
+  const input = useRef<TextInput>();
   const pageTitle = i18n.t("ADD_NEW_PARCEL_TITLE");
 
   useLayoutEffect(() => {
@@ -73,7 +74,7 @@ const NewParcelScreen: React.FC = ({ navigation, route }: NewParcelScreenProps) 
     }
     //update parcel
     if (action !== "add") {
-      const parcel: IParcel = {
+      const parcel: EditParcelParams = {
         id: trackingId,
         trackingNumber: inputTrackNumber,
         title: inputTrackTitle,
