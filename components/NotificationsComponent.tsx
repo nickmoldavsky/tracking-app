@@ -8,16 +8,13 @@ import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 //store
 import { useSelector, useDispatch } from "react-redux";
-//import { createNotifications } from "../store/parcelSlice";
-import { setNotification } from "../helpers/NotificationsHelper";
-
-import { IParcelState, ISettingsState } from "../interfaces/state";
 import { AppTheme } from "../styled/theme";
-import i18n from "../i18n/i18n";
 import { IParcel, IRequestParams } from "../interfaces/parcel";
 import { getPackageInfo, checkTrackingStatus } from "../store/parcelSlice";
 import { RootState } from "../store/store";
 import { useAppDispatch } from "../hooks/redux";
+//i18n
+import i18n from "../i18n/i18n";
 
 const BACKGROUND_FETCH_TASK = "background-fetch";
 let itemsCounter: number = 0;
@@ -184,7 +181,7 @@ const NotificationsComponent: React.FC = () => {
 
   return (
     <>
-      <View style={styles.row}>
+      {/* <View style={styles.row}>
         <Text style={styles.text}>
           Background fetch status:{" "}
           {status && BackgroundFetch.BackgroundFetchStatus[status]}
@@ -196,13 +193,13 @@ const NotificationsComponent: React.FC = () => {
           Background fetch task name:{" "}
           {isRegistered ? BACKGROUND_FETCH_TASK : "Not registered yet!"}
         </Text>
-      </View>
+      </View> */}
 
       <View style={styles.row}>
         <Text style={styles.text}>
           {isRegistered
-            ? "Disable Push Notification"
-            : "Enable Push Notification"}
+            ? i18n.t("DISABLE_PUSH_NOTIFICATION")
+            : i18n.t("ENABLE_PUSH_NOTIFICATION")}
         </Text>
         <Switch
           trackColor={{ false: "#3e3e3e", true: AppTheme[theme].button }}
@@ -212,6 +209,7 @@ const NotificationsComponent: React.FC = () => {
           value={isRegistered}
         />
       </View>
+      <View style={styles.separator} />
     </>
   );
 };
@@ -230,11 +228,17 @@ const createStyles = (theme: string) =>
     row: {
       width: "95%",
       flexDirection: "row",
-      margin: 10,
+      marginTop: 10,
+      padding: 15,
       alignItems: "center",
       color: AppTheme[theme].text,
       justifyContent: "space-between",
     },
+    separator: {
+      height: 0.5,
+      width: "100%",
+      backgroundColor: AppTheme[theme].itemSeparator,
+    }
   });
 
 export default NotificationsComponent;

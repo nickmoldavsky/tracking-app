@@ -18,11 +18,14 @@ const en = {
   ARCHIVE: "Archive",
   ADD_NEW_PARCEL_TITLE: "Add New Parcel",
   SETTINGS: "Settings",
-  APP_LANGUAGE: "App language",
+  APP_LANGUAGE: "App Language",
   DESTINATION_COUNTRY: "Destination Country",
   SET_LOCATION: "Location Settings",
   SET_LANGUAGE: "Language Settings",
   DARK_THEME: "Dark Theme",
+  ARCHIVE_DELIVERED_PARCELS: "Archive delivered parcels",
+  ENABLE_PUSH_NOTIFICATION: "Enable Push Notification",
+  DISABLE_PUSH_NOTIFICATION: "Disable Push Notification",
   transit: "Transit",
   arrived: "Arrived",
   archive: "Archive",
@@ -31,6 +34,13 @@ const en = {
   edit: "Edit",
   NOTIFICATION_TITLE: "Your parcel has an update!",
   NOTIFICATION_STATUS: " has an update from",
+  PARCEL_DETAILS_ERROR_MESSAGE: "No information about your parcel. We checked all relevant couriers for parcel ",
+  SCANNER: "Bar Code Scanner",
+  TAP_TO_SCAN_AGAIN: "Tap to Scan Again",
+  ADD_WITH_BAR_CODE: "Add",
+  ACTIVE: "Active",
+  DELIVERED: "Delivered",
+  DELETE_ALL_DELIVERED_ITEMS: "Delete all delivered items"
 };
 
 const ru = {
@@ -58,6 +68,9 @@ const ru = {
   SET_LOCATION: "Настройки местоположения",
   SET_LANGUAGE: "Настройки языка",
   DARK_THEME: "Темная тема",
+  ARCHIVE_DELIVERED_PARCELS: "Архивировать доставленные посылки",
+  ENABLE_PUSH_NOTIFICATION: "Включить уведомления",
+  DISABLE_PUSH_NOTIFICATION: "Выключить уведомления",
   transit: "В пути",
   arrived: "прибыл",
   archive: "Архив",
@@ -66,10 +79,17 @@ const ru = {
   edit: "Обновить",
   NOTIFICATION_TITLE: "У вашей посылки обновление!",
   NOTIFICATION_STATUS: " есть обновление от",
+  PARCEL_DETAILS_ERROR_MESSAGE: "Нет информации о вашей посылке. Мы проверили всех соответствующих курьеров на наличие посылки ",
+  SCANNER: "Сканер штрих-кода",
+  TAP_TO_SCAN_AGAIN: "Нажмите чтобы сканировать еще раз",
+  ADD_WITH_BAR_CODE: "Добавить",
+  ACTIVE: "В пути",
+  DELIVERED: "Доставленные",
+  DELETE_ALL_DELIVERED_ITEMS: "Удалить все доставленные"
 };
 
 const he = {
 
 }
 
-export { en, ru };
+export { en, ru, he};

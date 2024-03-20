@@ -23,39 +23,32 @@ import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons/";
 //import LoadingComponent from "../components/LoadingComponent";
 import DateTimeHelper from "../helpers/DateTimeHelper";
 import CopyToClipboardHelper from "../helpers/CopyToClipboardHelper";
-
-import { useSelector, useDispatch } from "react-redux";
-//import { useAppSelector, useAppDispatch } from "../hook/redux"; //redux types
+import { useAppSelector, useAppDispatch } from "../hooks/redux"; //redux types
 import { getPackageInfo, checkTrackingStatus } from "../store/parcelSlice";
-
 //interfaces
 import { IParcel, IRequestParams } from "../interfaces/parcel";
-import { IParcelState, ISettingsState } from "../interfaces/state";
-
-//styled
+//styled theme
 import { AppTheme } from "../styled/theme";
 import i18n from "../i18n/i18n";
 import { RootState } from "../store/store";
 import { DetailsScreenProps } from "../types/types";
+//maps
+import * as Location from "expo-location";
+import MapView, { Marker } from "react-native-maps";
+//sharing
+import * as Sharing from 'expo-sharing';
 
 const DetailsScreen: React.FC = ({ route, navigation }: DetailsScreenProps) => {
   const trackingId = route.params?.trackingNumber;
-  //alert('page opened !!!' + trackingId);
   const parcelId = route.params?.id;
-  //const parcelIndex = route.params?.index;
   const [parcelInfo, setParcelInfo] = useState<IParcel>();
   const [elementVisible, setElementVisible] = useState<boolean>(false);
-  const [responseError, setResponseError] = useState<boolean>(false);
   const errorMessage: string =
-    "No information about your parcel. We checked all relevant couriers for parcel " +
-    trackingId;
-  const dispatch = useDispatch<any>();
-  //const dispatch = useAppDispatch();
-  const { items, isLoading, error } = useSelector(
-    (state: RootState) => state.parcel
-  );
-  const { theme, language, location } = useSelector(
-    (state: RootState) => state.settings
+    i18n.t("PARCEL_DETAILS_ERROR_MESSAGE") + trackingId;
+  const dispatch = useAppDispatch();
+  const { items, isLoading, error } = useAppSelector((state) => state.parcel);
+  const { theme, language, location } = useAppSelector(
+    (state) => state.settings
   );
   // Constructing styles for current theme
   const styles: any = useMemo(() => createStyles(theme), [theme]); //TODO change <any> type
@@ -73,7 +66,10 @@ const DetailsScreen: React.FC = ({ route, navigation }: DetailsScreenProps) => {
       headerBackTitleVisible: false,
       headerStyle: { backgroundColor: AppTheme[theme].header },
       headerRight: () => (
-        <View style={styles.headerRight}>
+        <View style={[styles.headerRight, styles.row]}>
+          <TouchableOpacity onPress={() => Sharing.shareAsync('https://docs.expo.dev/versions/latest/sdk/sharing/')}>
+            <MaterialCommunityIcons name="share-variant" size={24} color="white" />
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => setElementVisible(!elementVisible)}>
             <Entypo name="dots-three-vertical" size={24} color="white" />
           </TouchableOpacity>
@@ -83,6 +79,7 @@ const DetailsScreen: React.FC = ({ route, navigation }: DetailsScreenProps) => {
   }, [elementVisible, theme]);
 
   useEffect(() => {
+    //Sharing.isAvailableAsync()
     if (firstUpdate.current) {
       firstUpdate.current = false;
       //alert("if firstUpdate.current" + firstUpdate.current);
@@ -97,14 +94,13 @@ const DetailsScreen: React.FC = ({ route, navigation }: DetailsScreenProps) => {
       }
     }
     return () => {
-      //TODO: abort request when living page
+      //TODO: abort request when living a page;
       //promise.abort();
     };
   }, [parcelInfo]); //TODO check if
 
   useEffect(() => {
     AppState.addEventListener("change", _handleAppStateChange);
-
     return () => {
       //AppState.removeEventListener("change", _handleAppStateChange);
     };
@@ -116,7 +112,6 @@ const DetailsScreen: React.FC = ({ route, navigation }: DetailsScreenProps) => {
       nextAppState === "active"
     ) {
       console.log("App has come to the foreground!");
-      //alert('App has come to the foreground!');
     }
 
     appState.current = nextAppState;
@@ -132,8 +127,8 @@ const DetailsScreen: React.FC = ({ route, navigation }: DetailsScreenProps) => {
     };
     const response = await dispatch(getPackageInfo(requestParams));
     console.log("DeatailsScreen/getPackageInfo/response:", response.payload);
-    if (response.payload?.uuid) {
-      getStatus(response.payload?.uuid);
+    if (response.payload["uuid"]) {
+      getStatus(response.payload["uuid"]);
     } else {
       console.log("request getPackageInfo complete!");
     }
@@ -151,7 +146,7 @@ const DetailsScreen: React.FC = ({ route, navigation }: DetailsScreenProps) => {
       "DetailsScreen/dispatch(checkTrackingStatus)/setTimeout:",
       response
     );
-    if (response.payload.done) {
+    if (response.payload["done"]) {
       console.log("Request complete");
     } else {
       console.log("delay 1sec ...");
@@ -183,6 +178,9 @@ const DetailsScreen: React.FC = ({ route, navigation }: DetailsScreenProps) => {
 
       {!error && (
         <View>
+          
+      {/* <MapView style={styles.map} /> */}
+    
           <View style={[styles.parcel, styles.row]}>
             <MaterialCommunityIcons
               name="package-variant-closed"
@@ -198,46 +196,50 @@ const DetailsScreen: React.FC = ({ route, navigation }: DetailsScreenProps) => {
             />
           </View>
 
-          <View style={[styles.route, styles.row]}>
-            <Text style={styles.statusText}>{parcelInfo?.origin}</Text>
-            <MaterialCommunityIcons
-              name="arrow-right"
-              size={24}
-              color={AppTheme[theme].text}
-            />
-            <Text style={styles.statusText}>{parcelInfo?.destination}</Text>
-          </View>
-
-          <View style={styles.status}>
-            <Text style={styles.statusText}>
-              {!parcelInfo?.status ? "" : i18n.t(parcelInfo?.status)}
-            </Text>
-            <View style={styles.progressBar}>
-              <Animated.View
-                style={[
-                  StyleSheet.absoluteFill,
-                  {
-                    backgroundColor: AppTheme[theme].button,
-                    width:
-                      parcelInfo?.status !== "delivered"
-                        ? parcelInfo?.status !== "arrived"
-                          ? "30%"
-                          : "85%"
-                        : "100%",
-                  },
-                ]}
+          {parcelInfo?.destination && (
+            <View style={[styles.route, styles.row]}>
+              <Text style={styles.statusText}>{parcelInfo?.origin}</Text>
+              <MaterialCommunityIcons
+                name="arrow-right"
+                size={24}
+                color={AppTheme[theme].text}
               />
+              <Text style={styles.statusText}>{parcelInfo?.destination}</Text>
             </View>
-          </View>
+          )}
 
-          <View style={styles.loadingIndicator}>
-            {/* {loadingIndicator && <LoadingComponent animation="wave" />} */}
-            {/* <ActivityIndicator
+          {parcelInfo?.status && (
+            <View style={styles.status}>
+              <Text style={styles.statusText}>
+                {!parcelInfo?.status ? "" : i18n.t(parcelInfo?.status)}
+              </Text>
+              <View style={styles.progressBar}>
+                <Animated.View
+                  style={[
+                    StyleSheet.absoluteFill,
+                    {
+                      backgroundColor: AppTheme[theme].button,
+                      width:
+                        parcelInfo?.status !== "delivered"
+                          ? parcelInfo?.status !== "arrived"
+                            ? "30%"
+                            : "85%"
+                          : "100%",
+                    },
+                  ]}
+                />
+              </View>
+            </View>
+          )}
+
+          {/*<View style={styles.loadingIndicator}>
+             {loadingIndicator && <LoadingComponent animation="wave" />} */}
+          {/* <ActivityIndicator
               animating={loadingIndicator}
               size="small"
               color={AppTheme[theme].button}
-            /> */}
-          </View>
+            /> 
+          </View>*/}
 
           <ScrollView
             refreshControl={
@@ -303,11 +305,13 @@ const createStyles = (theme: string) =>
   StyleSheet.create({
     container: {
       backgroundColor: AppTheme[theme].container,
-      height: "100%",
+      flex: 1,
     },
     center: {
       justifyContent: "center",
       alignItems: "center",
+    },
+    headerRight: {
     },
     parcel: {
       margin: 10,
@@ -363,6 +367,10 @@ const createStyles = (theme: string) =>
     scrollView: {
       //backgroundColor: AppTheme[theme].container,
       minHeight: 100,
+    },
+    map: {
+      width: "100%",
+      height: 150,
     },
   });
 

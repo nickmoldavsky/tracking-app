@@ -12,6 +12,24 @@ import { IParcel, IRequestParams } from "../interfaces/parcel";
 import { IParcelState } from "../interfaces/state";
 import { UpdateParcelParams, Notification } from "../types/types";
 
+// Create an instance of Axios
+const api = axios.create();
+
+// Request interceptor
+api.interceptors.request.use(
+  (config) => {
+    console.log('interceptors.request:', config);
+    alert('request interceptor!!!!');
+    // Modify the request config (e.g., add headers):
+    // config.headers.Authorization = 'Bearer YOUR_TOKEN';
+    return config;
+  },
+  (error) => {
+    // Handle request errors
+    return Promise.reject(error);
+  }
+);
+
 const initialState: IParcelState = {
   items: [],
   isLoading: false,

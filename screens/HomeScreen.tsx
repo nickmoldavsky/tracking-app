@@ -18,13 +18,13 @@ import {
   Modal,
   Alert,
   RefreshControl,
+  Platform
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SearchBar, Avatar } from "react-native-elements";
 import {
   AntDesign,
   FontAwesome,
-  Entypo,
   MaterialCommunityIcons,
 } from "@expo/vector-icons/";
 import { useIsFocused } from "@react-navigation/native";
@@ -68,6 +68,8 @@ const HomeScreen: React.FC = ({ navigation, route }: HomeProps) => {
   i18n.locale = language;
   // Constructing styles for current theme
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const activeItemsCount = 0;
+  const deliveredItemsCount = 0;
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -77,7 +79,8 @@ const HomeScreen: React.FC = ({ navigation, route }: HomeProps) => {
       headerStyle: { backgroundColor: AppTheme[theme].header },
       headerTitle: () => (
         <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-          <Avatar rounded source={require("../assets/moto.jpeg")} />
+          {/* <Avatar rounded source={require("../assets/moto.jpeg")} /> */}
+          <MaterialCommunityIcons name="gift" size={24} color="white" />
           <Text
             style={{
               color: "white",
@@ -85,12 +88,15 @@ const HomeScreen: React.FC = ({ navigation, route }: HomeProps) => {
               fontWeight: "700",
             }}
           >
-            Track4Parcel
+            TrackMyParcel
           </Text>
         </View>
       ),
       headerRight: () => (
         <View style={styles.headerRight}>
+           <TouchableOpacity style={styles.scannerIcon} onPress={() => navigation.navigate("Scanner")}>
+            <FontAwesome name="barcode" size={24} color="white" />
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
             <FontAwesome name="gear" size={24} color="white" />
           </TouchableOpacity>
@@ -105,7 +111,7 @@ const HomeScreen: React.FC = ({ navigation, route }: HomeProps) => {
   }, [updateStateFlag]);
 
   useEffect(() => {
-    tabFilterFunction("shipping");
+    tabFilterFunction("active");
   }, [masterDataSource]);
 
   useEffect(() => {
@@ -157,7 +163,7 @@ const HomeScreen: React.FC = ({ navigation, route }: HomeProps) => {
       const newData = masterDataSource.filter(function (item: IParcel) {
         const itemData = item.status ? item.status.toUpperCase() : "";
         const textData = tab.toUpperCase();
-        if (tab === "shipping") {
+        if (tab === "active") {
           return shipping.indexOf(itemData) > -1;
         } else {
           return itemData.indexOf(textData) > -1;
@@ -189,19 +195,14 @@ const HomeScreen: React.FC = ({ navigation, route }: HomeProps) => {
       // Update FilteredDataSource with masterDataSource
       setFilteredDataSource(masterDataSource);
       setSearch(text);
+      tabFilterFunction("active");
     }
   };
 
   const itemSeparatorView = () => {
     return (
       // Flat List Item Separator
-      <View
-        style={{
-          height: 0.5,
-          width: "100%",
-          backgroundColor: AppTheme[theme].itemSeparator,
-        }}
-      />
+      <View style={styles.separator} />
     );
   };
 
@@ -305,23 +306,23 @@ const HomeScreen: React.FC = ({ navigation, route }: HomeProps) => {
               styles.button,
               {
                 borderBottomColor:
-                  activeTab === "shipping"
+                  activeTab === "active"
                     ? AppTheme[theme].button
                     : AppTheme[theme].container,
               },
             ]}
-            onPress={() => tabFilterFunction("shipping")}
+            onPress={() => tabFilterFunction("active")}
           >
             <Text
               style={[
                 styles.buttonText,
                 {
                   color:
-                    activeTab === "shipping" ? AppTheme[theme].text : "#CCC",
+                    activeTab === "active" ? AppTheme[theme].text : "#CCC",
                 },
               ]}
             >
-              {i18n.t("shipping")}
+              {i18n.t("ACTIVE")}
             </Text>
           </Pressable>
           <Pressable
@@ -345,29 +346,10 @@ const HomeScreen: React.FC = ({ navigation, route }: HomeProps) => {
                 },
               ]}
             >
-              {i18n.t("delivered")}
+              {i18n.t("DELIVERED")}
             </Text>
           </Pressable>
-          <Pressable
-            style={[
-              styles.button,
-              {
-                borderBottomColor: !activeTab
-                  ? AppTheme[theme].button
-                  : AppTheme[theme].container,
-              },
-            ]}
-            onPress={() => tabFilterFunction("")}
-          >
-            <Text
-              style={[
-                styles.buttonText,
-                { color: !activeTab ? AppTheme[theme].text : "#CCC" },
-              ]}
-            >
-              {i18n.t("all")}
-            </Text>
-          </Pressable>
+          
         </View>
 
         {activeTab === "delivered" && (
@@ -382,7 +364,7 @@ const HomeScreen: React.FC = ({ navigation, route }: HomeProps) => {
                 size={24}
                 color="black"
               />
-              <Text style={styles.text}>Delete all delivered items</Text>
+              <Text style={styles.text}>{i18n.t("DELETE_ALL_DELIVERED_ITEMS")}</Text>
             </Pressable>
           </View>
         )}
@@ -484,7 +466,13 @@ const createStyles = (theme: string) =>
       backgroundColor: AppTheme[theme].container,
       flex: 1,
     },
-    headerRight: {},
+    headerRight: {
+      flexDirection: "row",
+      marginRight: (Platform.OS === 'ios') ? 40 : 0,
+    },
+    scannerIcon: {
+      marginRight: 20,
+    },
     tabView: {
       justifyContent: "space-between",
       //alignItems: 'center',
@@ -560,6 +548,12 @@ const createStyles = (theme: string) =>
       alignItems: "center",
       margin: 1,
     },
+    separator: {
+      height: 0.5,
+      width: "100%",
+      backgroundColor: AppTheme[theme].itemSeparator,
+    
+    }
   });
 
 export default HomeScreen;

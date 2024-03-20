@@ -11,7 +11,6 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { setLanguage, setLocation } from "../store/settingsSlice";
 import { AppTheme } from "../styled/theme";
-import { ISettingsState } from "../interfaces/state";
 import { MaterialCommunityIcons } from "@expo/vector-icons/";
 import i18n from "../i18n/i18n";
 import { RootState } from "../store/store";
@@ -51,7 +50,7 @@ const LocationScreen: React.FC = ({ navigation, route }: LocationScreenProps) =>
   const Item = ({ item, onPress, backgroundColor, textColor }) => (
     <TouchableOpacity
       onPress={onPress}
-      style={[styles.item, backgroundColor]}
+      style={[styles.item]}
       disabled={item.value === selectedItem}
     >
       <Text style={[styles.title, textColor]}>{item.title}</Text>
@@ -59,7 +58,7 @@ const LocationScreen: React.FC = ({ navigation, route }: LocationScreenProps) =>
         <MaterialCommunityIcons
           name="check-circle"
           size={20}
-          color="#FFF"
+          color={AppTheme[theme].button}
           style={styles.icon}
         />
       )}
@@ -93,19 +92,33 @@ const LocationScreen: React.FC = ({ navigation, route }: LocationScreenProps) =>
     );
   };
 
+  const itemSeparatorView = () => {
+    return (
+      // Flat List Item Separator
+      <View
+        style={{
+          height: 0.5,
+          width: "100%",
+          backgroundColor: AppTheme[theme].itemSeparator,
+        }}
+      />
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
         data={ACTION !== "SET_LANGUAGE" ? LOCATION_DATA : LANGUAGE_DATA}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
+        ItemSeparatorComponent={itemSeparatorView}
         //extraData={selectedId}
       />
     </SafeAreaView>
   );
 }
 
-const createStyles = (theme: any) =>
+const createStyles = (theme: string) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -116,16 +129,13 @@ const createStyles = (theme: any) =>
       margin: 10,
       padding: 10,
       backgroundColor: AppTheme[theme].container,
-      width: "95%",
-      flex: 1,
-      alignSelf: "center",
       flexDirection: "row",
       borderRadius: 5,
       justifyContent: "space-between",
     },
     icon: {},
     title: {
-      fontSize: 18,
+      fontSize: 16,
     },
     row: {
       flexDirection: "row",

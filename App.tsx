@@ -8,6 +8,7 @@ import NewParcelScreen from "./screens/NewParcelScreen";
 import DetailsScreen from "./screens/DetailsScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import LocationScreen from "./screens/LocationScreen";
+import ScannerScreen from "./screens/ScannerScreen";
 
 import { persistor, store } from "./store/store";
 import { Provider } from "react-redux";
@@ -51,11 +52,12 @@ export default function App() {
       <PersistGate loading={null} persistor={persistor}>
         <NavigationContainer ref={navigationContainerRef}>
           <Stack.Navigator screenOptions={globalScreenOptions}>
-            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="Home" component={HomeScreen} options={{animation: "none"}} />
             <Stack.Screen name="NewParcel" component={NewParcelScreen} options={{animation: "none"}} />
-            <Stack.Screen name="Details" component={DetailsScreen} />
-            <Stack.Screen name="Settings" component={SettingsScreen} />
-            <Stack.Screen name="Location" component={LocationScreen} />
+            <Stack.Screen name="Details" component={DetailsScreen} options={{animation: "none"}} />
+            <Stack.Screen name="Settings" component={SettingsScreen} options={{animation: "none"}} />
+            <Stack.Screen name="Location" component={LocationScreen} options={{animation: "none"}} />
+            <Stack.Screen name="Scanner" component={ScannerScreen} options={{animation: "none"}} />
           </Stack.Navigator>
         </NavigationContainer>
       </PersistGate>

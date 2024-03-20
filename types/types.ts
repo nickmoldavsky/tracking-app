@@ -18,6 +18,9 @@ export type RootStackParamList = {
   Location: {
     action: string;
   };
+  Scanner: {
+
+  }
 };
 
 export type DetailsScreenProps = NativeStackScreenProps<
@@ -28,6 +31,11 @@ export type DetailsScreenProps = NativeStackScreenProps<
 export type LocationScreenProps = NativeStackScreenProps<
   RootStackParamList,
   "Location"
+>;
+
+export type ScannerScreenProps = NativeStackScreenProps<
+  RootStackParamList,
+  "Scanner"
 >;
 
 export type NewParcelScreenProps = NativeStackScreenProps<
@@ -44,8 +52,8 @@ export type UpdateParcelParams = {
   id: number;
   trackingNumber?: string;
   title?: string;
-  action: string;
-  status: string;
+  action?: string;
+  status?: string;
 };
 
 export type Notification = {

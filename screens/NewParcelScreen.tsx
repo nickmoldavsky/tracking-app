@@ -31,15 +31,16 @@ import { IParcel } from "../interfaces/parcel";
 import { AppTheme } from "../styled/theme";
 import i18n from "../i18n/i18n";
 import { RootState } from "../store/store";
-import { EditParcelParams, NewParcelScreenProps, UpdateParcelParams } from "../types/types";
+import { NewParcelScreenProps, UpdateParcelParams } from "../types/types";
 
-const NewParcelScreen: React.FC = ({ navigation, route }: NewParcelScreenProps) => {
+const NewParcelScreen: React.FC = ({
+  navigation,
+  route,
+}: NewParcelScreenProps) => {
   const dispatch = useDispatch();
   const parcels = useSelector((state: RootState) => state.parcel.items);
   //console.log("newParcelScreen useSelector state.parcel:", parcels);
-  const { theme, language } = useSelector(
-    (state: RootState) => state.settings
-  );
+  const { theme, language } = useSelector((state: RootState) => state.settings);
   i18n.locale = language;
   // Constructing styles for current theme
   const styles: any = useMemo(() => createStyles(theme), [theme]); //TODO: change any type
@@ -72,9 +73,24 @@ const NewParcelScreen: React.FC = ({ navigation, route }: NewParcelScreenProps) 
       input.current?.shake();
       return;
     }
-    //update parcel
-    if (action !== "add") {
-      const parcel: EditParcelParams = {
+    if (action !== "edit") {
+      //add parcel
+      const payload: IParcel = {
+        id: uid,
+        title: inputTrackTitle,
+        trackingNumber: inputTrackNumber,
+      };
+      dispatch(addParcel(payload));
+      //navigate to the main screen
+      navigation.dispatch(StackActions.popToTop());
+      navigation.navigate("Details", {
+        trackingNumber: inputTrackNumber,
+        id: payload.id,
+        trackingTitle: inputTrackTitle,
+      });
+    } else {
+      // update parcel
+      const parcel: UpdateParcelParams = {
         id: trackingId,
         trackingNumber: inputTrackNumber,
         title: inputTrackTitle,
@@ -82,22 +98,7 @@ const NewParcelScreen: React.FC = ({ navigation, route }: NewParcelScreenProps) 
       console.log("edit payload: ", parcel);
       dispatch(editParcel(parcel));
       navigation.navigate("Home");
-      return;
     }
-    //add parcel
-    const payload: IParcel = {
-      id: uid,
-      title: inputTrackTitle,
-      trackingNumber: inputTrackNumber,
-    };
-    dispatch(addParcel(payload));
-    //navigate to the main screen
-    navigation.dispatch(StackActions.popToTop());
-    navigation.navigate("Details", {
-      trackingNumber: inputTrackNumber,
-      id: payload.id,
-      trackingTitle: inputTrackTitle,
-    });
   };
 
   return (
