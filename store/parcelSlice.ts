@@ -52,7 +52,7 @@ let timeOutId: ReturnType<typeof setTimeout>;
 
 export const checkTrackingStatus = createAsyncThunk<IParcel[], string>(
   "parcel/checkTrackingStatus",
-  async (uuid, { dispatch, getState }) => {
+  async (uuid, { dispatch, getState, rejectWithValue }) => {
     const res = await axios.get( //<IParcel[]>
       API_URL + "?uuid=" + uuid + "&apiKey=" + API_KEY
     );
@@ -61,13 +61,11 @@ export const checkTrackingStatus = createAsyncThunk<IParcel[], string>(
     //
     if (data.done) {
       if (data.shipments[0].error) {
-        console.error("checkTrackingStatus error:", data.shipments[0].error);
+        console.log("checkTrackingStatus error:", data.shipments[0].error);
         if (timeOutId) {
           clearTimeout(timeOutId);
         }
-        //TODO: show error message to the user
-        //state.error = true;
-        return data;
+        return rejectWithValue(data.shipments[0].error);
       } else {
         dispatch(updateParcel(data));
         console.log("Tracking complete");
@@ -312,8 +310,6 @@ export const parcelSlice = createSlice({
     builder.addCase(checkTrackingStatus.fulfilled, (state, action) => {
       if (action.payload["done"]) {
         state.isLoading = false;
-        //TODO: remove the code below, slice made for state changes only, do not call dispatch!!!
-        //parcelSlice.caseReducers.updateParcel(state, action);
       }
     });
     builder.addCase(checkTrackingStatus.rejected, (state, action) => {

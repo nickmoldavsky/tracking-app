@@ -75,6 +75,7 @@ const ParcelListItem: React.FC = ({ item, openEditModal }: Props) => {
           <Text style={[styles.text, styles.opacity]}>{item?.trackingNumber}</Text>
           {/* <Text style={styles.text}>{i18n.t(item?.status)}</Text> */}
           <Text style={styles.text} numberOfLines={1}>
+            {!item.status ? i18n.t("NO_DATA") : ''}
             {item?.lastState?.status}
           </Text>
           <Text style={[styles.text, styles.dateTime, styles.opacity]} numberOfLines={1}>
@@ -82,7 +83,7 @@ const ParcelListItem: React.FC = ({ item, openEditModal }: Props) => {
           </Text>
         </View>
         <TouchableOpacity
-          style={styles.center}
+          
           onPress={() => openEditModal(item)}
         >
           <Entypo

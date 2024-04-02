@@ -16,7 +16,10 @@ import i18n from "../i18n/i18n";
 import { RootState } from "../store/store";
 import { Item, LocationScreenProps } from "../types/types";
 
-const LocationScreen: React.FC = ({ navigation, route }: LocationScreenProps) => {
+const LocationScreen: React.FC = ({
+  navigation,
+  route,
+}: LocationScreenProps) => {
   const ACTION = route.params.action;
   const dispatch = useDispatch();
   const { theme, darkmode, language, location } = useSelector(
@@ -95,13 +98,7 @@ const LocationScreen: React.FC = ({ navigation, route }: LocationScreenProps) =>
   const itemSeparatorView = () => {
     return (
       // Flat List Item Separator
-      <View
-        style={{
-          height: 0.5,
-          width: "100%",
-          backgroundColor: AppTheme[theme].itemSeparator,
-        }}
-      />
+      <View style={styles.separator} />
     );
   };
 
@@ -116,7 +113,7 @@ const LocationScreen: React.FC = ({ navigation, route }: LocationScreenProps) =>
       />
     </SafeAreaView>
   );
-}
+};
 
 const createStyles = (theme: string) =>
   StyleSheet.create({
@@ -142,6 +139,11 @@ const createStyles = (theme: string) =>
       margin: 10,
       alignItems: "center",
     },
+    separator: {
+      height: 0.5,
+      width: "100%",
+      backgroundColor: AppTheme[theme].itemSeparator,
+    },
   });
 
-  export default LocationScreen;
+export default LocationScreen;

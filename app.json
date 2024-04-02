@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "parcelTracking",
-    "slug": "parcelTracking",
+    "slug": "track247",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -47,6 +47,12 @@
           "cameraPermission": "Allow $(PRODUCT_NAME) to access camera."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d448e29c-4a7f-4399-a1a7-6adaaccfdbde"
+      }
+    },
+    "owner": "kokonatz"
   }
 }

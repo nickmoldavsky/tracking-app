@@ -36,7 +36,8 @@ import { DetailsScreenProps } from "../types/types";
 import * as Location from "expo-location";
 import MapView, { Marker } from "react-native-maps";
 //sharing
-import * as Sharing from 'expo-sharing';
+import * as Sharing from "expo-sharing";
+import FooterComponent from "../components/FooterComponent";
 
 const DetailsScreen: React.FC = ({ route, navigation }: DetailsScreenProps) => {
   const trackingId = route.params?.trackingNumber;
@@ -62,13 +63,23 @@ const DetailsScreen: React.FC = ({ route, navigation }: DetailsScreenProps) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       title: route.params?.trackingTitle,
-      headerTitleAlign: "center",
+      headerTitleAlign: "left",
       headerBackTitleVisible: false,
       headerStyle: { backgroundColor: AppTheme[theme].header },
       headerRight: () => (
         <View style={[styles.headerRight, styles.row]}>
-          <TouchableOpacity onPress={() => Sharing.shareAsync('https://docs.expo.dev/versions/latest/sdk/sharing/')}>
-            <MaterialCommunityIcons name="share-variant" size={24} color="white" />
+          <TouchableOpacity
+            onPress={() =>
+              Sharing.shareAsync(
+                "https://docs.expo.dev/versions/latest/sdk/sharing/"
+              )
+            }
+          >
+            <MaterialCommunityIcons
+              name="share-variant"
+              size={24}
+              color="white"
+            />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setElementVisible(!elementVisible)}>
             <Entypo name="dots-three-vertical" size={24} color="white" />
@@ -140,16 +151,22 @@ const DetailsScreen: React.FC = ({ route, navigation }: DetailsScreenProps) => {
 
   const delay = async (ms: number) => new Promise((res) => setTimeout(res, ms));
 
+  // change it !!!
   const getStatus = async (uuid: string) => {
     const response = await dispatch(checkTrackingStatus(uuid));
     console.log(
       "DetailsScreen/dispatch(checkTrackingStatus)/setTimeout:",
-      response
+      response.payload
     );
+
+    if (response.payload === "NO_DATA") {
+      return;
+    }
+
     if (response.payload["done"]) {
       console.log("Request complete");
     } else {
-      console.log("delay 1sec ...");
+      console.log("delay 1sec ...++");
       await delay(1000);
       getStatus(uuid);
     }
@@ -170,7 +187,7 @@ const DetailsScreen: React.FC = ({ route, navigation }: DetailsScreenProps) => {
     <SafeAreaView style={styles.container}>
       {error && (
         <View style={[styles.container, styles.center]}>
-          <Text>{errorMessage}</Text>
+          <Text style={styles.text}>{errorMessage}</Text>
         </View>
       )}
 
@@ -178,9 +195,8 @@ const DetailsScreen: React.FC = ({ route, navigation }: DetailsScreenProps) => {
 
       {!error && (
         <View>
-          
-      {/* <MapView style={styles.map} /> */}
-    
+          {/* <MapView style={styles.map} /> */}
+
           <View style={[styles.parcel, styles.row]}>
             <MaterialCommunityIcons
               name="package-variant-closed"
@@ -269,13 +285,7 @@ const DetailsScreen: React.FC = ({ route, navigation }: DetailsScreenProps) => {
                       color={AppTheme[theme].button}
                     />
                     <ListItem.Content>
-                      <ListItem.Title
-                        style={{
-                          fontWeight: "800",
-                          fontSize: 15,
-                          color: AppTheme[theme].title,
-                        }}
-                      >
+                      <ListItem.Title style={styles.title}>
                         {state?.status}
                       </ListItem.Title>
                       <ListItem.Subtitle
@@ -311,11 +321,18 @@ const createStyles = (theme: string) =>
       justifyContent: "center",
       alignItems: "center",
     },
-    headerRight: {
-    },
+    headerRight: {},
     parcel: {
       margin: 10,
       alignItems: "center",
+    },
+    title: {
+      fontWeight: "bold",
+      fontSize: 14,
+      color: AppTheme[theme].title,
+    },
+    text: {
+      color: AppTheme[theme].text
     },
     row: {
       flexDirection: "row",

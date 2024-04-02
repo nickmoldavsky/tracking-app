@@ -147,8 +147,8 @@ const NotificationsComponent: React.FC = () => {
     } else {
       const requestParams: IRequestParams = {
         trackingId: items[itemsCounter].trackingNumber,
-        location: location ? location : 'Israel',
-        language: language ? language : 'en',
+        location: location ? location : "Israel",
+        language: language ? language : "en",
       };
       const response = await dispatch(getPackageInfo(requestParams));
       if (response.payload?.uuid) {
@@ -226,7 +226,6 @@ const createStyles = (theme: string) =>
     },
     paragraph: {},
     row: {
-      width: "95%",
       flexDirection: "row",
       marginTop: 10,
       padding: 15,
@@ -238,7 +237,7 @@ const createStyles = (theme: string) =>
       height: 0.5,
       width: "100%",
       backgroundColor: AppTheme[theme].itemSeparator,
-    }
+    },
   });
 
 export default NotificationsComponent;

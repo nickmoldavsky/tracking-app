@@ -18,7 +18,7 @@ import {
   Modal,
   Alert,
   RefreshControl,
-  Platform
+  Platform,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SearchBar, Avatar } from "react-native-elements";
@@ -88,13 +88,16 @@ const HomeScreen: React.FC = ({ navigation, route }: HomeProps) => {
               fontWeight: "700",
             }}
           >
-            TrackMyParcel
+            Track24/7
           </Text>
         </View>
       ),
       headerRight: () => (
         <View style={styles.headerRight}>
-           <TouchableOpacity style={styles.scannerIcon} onPress={() => navigation.navigate("Scanner")}>
+          <TouchableOpacity
+            style={styles.scannerIcon}
+            onPress={() => navigation.navigate("Scanner")}
+          >
             <FontAwesome name="barcode" size={24} color="white" />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
@@ -157,7 +160,7 @@ const HomeScreen: React.FC = ({ navigation, route }: HomeProps) => {
     //let data = masterDataSource.sort((a, b) => a.status.localeCompare(b.status));
     //console.log('data sort by:', data);
 
-    const shipping = ["TRANSIT", "ARRIVED", "PICKUP", "ARCHIVE"];
+    const shipping = ["TRANSIT", "ARRIVED", "PICKUP", "ARCHIVE", ""];
     setActiveTab(tab);
     if (tab) {
       const newData = masterDataSource.filter(function (item: IParcel) {
@@ -301,57 +304,41 @@ const HomeScreen: React.FC = ({ navigation, route }: HomeProps) => {
         </View>
 
         <View style={[styles.tabView, styles.row]}>
-          <Pressable
+          <TouchableOpacity
             style={[
               styles.button,
               {
                 borderBottomColor:
                   activeTab === "active"
                     ? AppTheme[theme].button
-                    : AppTheme[theme].container,
+                    : AppTheme[theme].itemSeparator,    
               },
             ]}
             onPress={() => tabFilterFunction("active")}
           >
-            <Text
-              style={[
-                styles.buttonText,
-                {
-                  color:
-                    activeTab === "active" ? AppTheme[theme].text : "#CCC",
-                },
-              ]}
-            >
+            <Text style={[styles.text, styles.buttonText]}>
               {i18n.t("ACTIVE")}
             </Text>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             style={[
               styles.button,
               {
                 borderBottomColor:
                   activeTab === "delivered"
                     ? AppTheme[theme].button
-                    : AppTheme[theme].container,
+                    : AppTheme[theme].itemSeparator,
               },
             ]}
             onPress={() => tabFilterFunction("delivered")}
           >
-            <Text
-              style={[
-                styles.buttonText,
-                {
-                  color:
-                    activeTab === "delivered" ? AppTheme[theme].text : "#CCC",
-                },
-              ]}
-            >
+            <Text style={[styles.text, styles.buttonText]}>
               {i18n.t("DELIVERED")}
             </Text>
-          </Pressable>
-          
+          </TouchableOpacity>
         </View>
 
+        {/* delete all delivered items option */}
         {activeTab === "delivered" && (
           <View style={styles.row}>
             <Pressable
@@ -364,7 +351,9 @@ const HomeScreen: React.FC = ({ navigation, route }: HomeProps) => {
                 size={24}
                 color="black"
               />
-              <Text style={styles.text}>{i18n.t("DELETE_ALL_DELIVERED_ITEMS")}</Text>
+              <Text style={styles.text}>
+                {i18n.t("DELETE_ALL_DELIVERED_ITEMS")}
+              </Text>
             </Pressable>
           </View>
         )}
@@ -376,13 +365,13 @@ const HomeScreen: React.FC = ({ navigation, route }: HomeProps) => {
           keyExtractor={(item, index) => index.toString()}
           ItemSeparatorComponent={itemSeparatorView}
           //ListRenderItem<IParcel[]>
-          renderItem = {({ item }) => (
+          renderItem={({ item }) => (
             <ParcelListItem item={item} openEditModal={openEditModal} />
           )}
         />
 
         <View style={styles.addButtonContainer}>
-          <Pressable
+        <TouchableOpacity
             style={styles.addButton}
             onPress={() => navigation.navigate("NewParcel", { action: "add" })}
             //onPress={() => navigation.navigate("Notifications", { action: "add" })}
@@ -392,7 +381,7 @@ const HomeScreen: React.FC = ({ navigation, route }: HomeProps) => {
               size={54}
               color={AppTheme[theme].button}
             />
-          </Pressable>
+          </TouchableOpacity>
         </View>
 
         <StatusBar style="light" />
@@ -468,7 +457,7 @@ const createStyles = (theme: string) =>
     },
     headerRight: {
       flexDirection: "row",
-      marginRight: (Platform.OS === 'ios') ? 40 : 0,
+      marginRight: Platform.OS === "ios" ? 40 : 0,
     },
     scannerIcon: {
       marginRight: 20,
@@ -489,7 +478,6 @@ const createStyles = (theme: string) =>
       borderBottomWidth: 1,
     },
     buttonText: {
-      color: "#CCC",
       padding: 5,
     },
     text: {
@@ -552,8 +540,7 @@ const createStyles = (theme: string) =>
       height: 0.5,
       width: "100%",
       backgroundColor: AppTheme[theme].itemSeparator,
-    
-    }
+    },
   });
 
 export default HomeScreen;

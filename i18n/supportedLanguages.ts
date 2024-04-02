@@ -40,7 +40,8 @@ const en = {
   ADD_WITH_BAR_CODE: "Add",
   ACTIVE: "Active",
   DELIVERED: "Delivered",
-  DELETE_ALL_DELIVERED_ITEMS: "Delete all delivered items"
+  DELETE_ALL_DELIVERED_ITEMS: "Delete all delivered items",
+  NO_DATA: "No information"
 };
 
 const ru = {
@@ -85,7 +86,8 @@ const ru = {
   ADD_WITH_BAR_CODE: "Добавить",
   ACTIVE: "В пути",
   DELIVERED: "Доставленные",
-  DELETE_ALL_DELIVERED_ITEMS: "Удалить все доставленные"
+  DELETE_ALL_DELIVERED_ITEMS: "Удалить все доставленные",
+  NO_DATA: "Нет информации"
 };
 
 const he = {
